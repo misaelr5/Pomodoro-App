@@ -1,4 +1,4 @@
-# ISRA FOCUS
+# ISRA FOCUS 1.0
 
 ISRA FOCUS es una app de escritorio para organizar sesiones de enfoque, descanso y seguimiento de productividad.
 
