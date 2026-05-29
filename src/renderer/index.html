@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISRAFocus</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar animate-slide-down" aria-label="Resumen de sesion">
+        <div>
+          <div class="brand-badge" aria-label="ISRAFocus">
+            <span class="brand-mark">
+              <img src="./assets/israfocus-icon.png" alt="" />
+            </span>
+            <span>ISRAFocus</span>
+          </div>
+          <p class="subtitle rotating-message" id="openingMessage">
+            Cuanto tiempo le vas a invertir a tu futuro hoy?
+          </p>
+        </div>
+        <div class="topbar-actions">
+          <label class="theme-switch">
+            <input id="themeToggle" type="checkbox" />
+            <span></span>
+            <strong>Space</strong>
+          </label>
+          <button class="ghost-button" id="mainMinimizeButton" type="button">Minimizar</button>
+          <button class="ghost-button" id="finishDayButton" type="button">Terminar dia</button>
+          <div class="metric-pill">
+            <span id="streakCount">0</span>
+            <small>🔥 racha</small>
+          </div>
+          <div class="metric-pill">
+            <span id="sessionCount">0</span>
+            <small>pomodoros hoy</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="mode-panel animate-slide-left" aria-label="Elegir modo Pomodoro">
+          <div class="section-heading">
+            <p class="eyebrow">Modo</p>
+            <h2>Elegi tu ritmo</h2>
+          </div>
+          <div class="mode-list" id="modeList"></div>
+          <p class="long-break-note">
+            Regla practica: cada 3 o 4 bloques, hace un descanso mas largo de 20 a 30 min.
+          </p>
+          <button class="primary-action" id="startFocusButton" type="button">Iniciar focus</button>
+        </aside>
+
+        <section class="timer-panel animate-scale-in" aria-live="polite">
+          <div class="timer-header">
+            <div>
+              <p class="eyebrow" id="phaseLabel">Preparacion</p>
+              <h2 id="activeModeName">Clasico</h2>
+              <p class="active-task" id="activeTaskLabel">Sin tarea activa</p>
+            </div>
+            <div class="time-summary" id="timeSummary">25 min foco + 5 min descanso</div>
+          </div>
+
+          <div class="progress-wrap">
+            <svg class="progress-ring" viewBox="0 0 260 260" role="img" aria-label="Progreso del temporizador">
+              <circle class="progress-track" cx="130" cy="130" r="112"></circle>
+              <circle class="progress-value" id="progressValue" cx="130" cy="130" r="112"></circle>
+            </svg>
+            <div class="timer-readout">
+              <span id="timerDisplay">25:00</span>
+              <small id="timerCaption">Listo para empezar</small>
+            </div>
+          </div>
+
+          <div class="controls" aria-label="Controles del temporizador">
+            <button id="pauseButton" type="button" disabled>Pausar</button>
+            <button id="resumeButton" type="button" disabled>Continuar</button>
+            <button id="toBreakButton" type="button" disabled>Pasar a descanso</button>
+            <button id="resetButton" type="button">Reiniciar</button>
+          </div>
+
+          <div class="completion-card" id="completionCard" hidden>
+            <p class="eyebrow">Pomodoro completado</p>
+            <h3>Felicidades</h3>
+            <p id="completionMessage"></p>
+          </div>
+        </section>
+      </section>
+
+      <section class="workspace-panel animate-slide-up" aria-label="Paneles de productividad">
+        <div class="tabs" role="tablist" aria-label="Secciones">
+          <button class="tab-button" data-tab="tasks" type="button">Tareas</button>
+          <button class="tab-button" data-tab="history" type="button">Historial</button>
+          <button class="tab-button" data-tab="stats" type="button">Estadisticas</button>
+        </div>
+
+        <section class="tab-panel" id="tasksPanel">
+          <form class="task-form" id="taskForm">
+            <label>
+              Tarea
+              <input id="taskTitleInput" type="text" maxlength="90" placeholder="Que vas a hacer?" required />
+            </label>
+            <label>
+              Categoria
+              <select id="taskCategorySelect"></select>
+            </label>
+            <label id="customCategoryWrap" hidden>
+              Nueva categoria
+              <input id="customCategoryInput" type="text" maxlength="24" placeholder="Nombre" />
+            </label>
+            <label>
+              Estimacion
+              <select id="taskEstimateSelect"></select>
+            </label>
+            <button class="primary-action compact" type="submit">Agregar tarea</button>
+          </form>
+          <div class="task-list" id="taskList"></div>
+        </section>
+
+        <section class="tab-panel" id="historyPanel" hidden>
+          <div class="panel-actions">
+            <h2>Historial del dia</h2>
+            <button class="ghost-button" id="exportCsvButton" type="button">Exportar CSV</button>
+          </div>
+          <div class="history-list" id="historyList"></div>
+        </section>
+
+        <section class="tab-panel" id="statsPanel" hidden>
+          <div class="panel-actions">
+            <h2>Estadisticas semanales</h2>
+            <label class="inline-filter">
+              Categoria
+              <select id="statsCategoryFilter"></select>
+            </label>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <p class="eyebrow">Ultimos 7 dias</p>
+              <div class="bar-chart" id="weeklyChart"></div>
+            </article>
+            <article class="stat-card">
+              <p class="eyebrow">Productividad</p>
+              <div class="stat-lines" id="weeklySummary"></div>
+            </article>
+            <article class="stat-card">
+              <p class="eyebrow">Categorias</p>
+              <div class="category-breakdown" id="categoryBreakdown"></div>
+            </article>
+            <article class="stat-card">
+              <p class="eyebrow">Estimacion vs realidad</p>
+              <div class="stat-lines" id="accuracySummary"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <section class="mini-player animate-fade-in delay-600" id="miniPlayer" aria-label="Mini player ISRAFocus">
+      <div class="mini-player__header" id="miniDragHandle">
+        <div class="brand-badge brand-badge--dark" aria-label="ISRAFocus">
+          <span class="brand-mark">
+            <img src="./assets/israfocus-icon.png" alt="" />
+          </span>
+          <span>ISRAFocus</span>
+        </div>
+        <div class="mini-player__window-controls">
+          <button id="miniMinimizeButton" type="button" aria-label="Minimizar mini player">_</button>
+          <button id="miniExpandButton" type="button" aria-label="Expandir mini player">[]</button>
+          <button id="miniCloseButton" type="button" aria-label="Cerrar mini player">x</button>
+        </div>
+      </div>
+      <div class="mini-player__body">
+        <div class="mini-cover" id="miniCover">
+          <div class="mini-cover__ring"></div>
+          <div class="mini-cover__time">
+            <strong id="miniTime">25:00</strong>
+            <span id="miniPhase">Preparacion</span>
+          </div>
+        </div>
+        <div class="mini-player__info">
+          <p id="miniMode">Clasico</p>
+          <small id="miniCaption">Listo para empezar</small>
+        </div>
+        <div class="mini-player__controls">
+          <button id="miniPlayPauseButton" type="button">Iniciar</button>
+          <button id="miniNextButton" type="button" disabled>Descanso</button>
+          <button id="miniResetButton" type="button">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <button class="mini-launcher" id="miniLauncher" type="button" hidden>Mini</button>
+
+    <dialog class="app-dialog" id="noteDialog">
+      <form method="dialog" class="dialog-card" id="noteForm">
+        <p class="eyebrow">Nota rapida</p>
+        <h2>Como fue este bloque?</h2>
+        <textarea id="noteInput" maxlength="200" placeholder="Maximo 200 caracteres"></textarea>
+        <div class="dialog-actions">
+          <button class="ghost-button" value="skip" type="submit">Omitir</button>
+          <button class="primary-action compact" value="save" type="submit">Guardar nota</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="summaryDialog">
+      <form method="dialog" class="dialog-card summary-dialog" id="summaryForm">
+        <p class="eyebrow">Resumen</p>
+        <h2 id="summaryTitle">Cierre del dia</h2>
+        <div class="summary-grid" id="summaryContent"></div>
+        <div class="dialog-actions">
+          <button class="ghost-button" value="close" type="submit">Seguir trabajando</button>
+          <button class="primary-action compact" id="confirmCloseButton" value="confirm" type="submit">Cerrar app</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>

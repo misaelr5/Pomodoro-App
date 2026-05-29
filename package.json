@@ -1,0 +1,14 @@
+{
+  "name": "israfocus",
+  "version": "0.1.0",
+  "productName": "ISRA FOCUS",
+  "description": "Sistema de enfoque por bloques para estudiar, programar y trabajar con más disciplina.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.0.0",
+    "electron": "^31.7.7"
+  }
+}

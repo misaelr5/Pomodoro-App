@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISRAFocus Mini</title>
+    <link rel="stylesheet" href="./mini.css" />
+  </head>
+  <body>
+    <main class="mini-shell" id="miniShell">
+      <header class="mini-header">
+        <div class="brand">
+          <img src="./assets/israfocus-icon.png" alt="" />
+          <strong>ISRAFocus</strong>
+        </div>
+        <div class="window-actions">
+          <button id="restoreButton" type="button" aria-label="Abrir app">□</button>
+          <button id="closeButton" type="button" aria-label="Cerrar mini">x</button>
+        </div>
+      </header>
+
+      <section class="mini-body">
+        <div class="cover" id="cover">
+          <div class="cover-inner">
+            <strong id="time">25:00</strong>
+            <span id="phase">Preparacion</span>
+          </div>
+        </div>
+
+        <div class="info">
+          <h1 id="mode" class="mode-picker" title="Click y rueda para cambiar modo">Clasico</h1>
+          <p id="caption">Listo para empezar</p>
+          <div class="controls">
+            <button id="playPauseButton" type="button">Iniciar</button>
+            <button id="nextButton" type="button" disabled>Descanso</button>
+            <button id="resetButton" type="button">Reset</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./mini.js"></script>
+  </body>
+</html>
