@@ -36,3 +36,11 @@ npm start
 ```bash
 npm run build:win
 ```
+
+## Crear instalador para Windows
+
+```bash
+npm run installer:win
+```
+
+El instalador queda en la carpeta `release`.

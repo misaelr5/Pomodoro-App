@@ -2,14 +2,45 @@
   "name": "pomodoro-app",
   "version": "0.1.0",
   "productName": "Pomodoro App",
-  "description": "Sistema de enfoque por bloques para estudiar, programar y trabajar con más disciplina.",
+  "description": "Sistema de enfoque por bloques para estudiar, programar y trabajar con mas disciplina.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-packager . \"Pomodoro App\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/dist($|/)\" --ignore=\"^/isra-portfolio($|/)\""
+    "build:win": "electron-packager . \"Pomodoro App\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/dist($|/)\" --ignore=\"^/isra-portfolio($|/)\"",
+    "installer:win": "electron-builder --win nsis --x64"
   },
   "devDependencies": {
     "@electron/packager": "^20.0.0",
-    "electron": "^31.7.7"
+    "electron": "^31.7.7",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.misaelr5.pomodoroapp",
+    "productName": "Pomodoro App",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pomodoro App"
+    }
   }
 }
