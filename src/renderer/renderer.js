@@ -295,6 +295,7 @@ function toggleTheme() {
   currentTheme = elements.themeToggle.checked ? "space" : "light";
   localStorage.setItem(THEME_KEY, currentTheme);
   applyTheme();
+  render();
 }
 
 function applySettings() {
@@ -780,7 +781,8 @@ function sendMiniSnapshot({ mode, isRunning, isSetup, isComplete, isFocus }) {
     playPauseLabel: getMiniPlayPauseLabel(isRunning, isSetup, isComplete),
     nextLabel: shouldUseLongBreak() ? "Largo" : "Descanso",
     canStartBreak: isFocus && !isRunning && state.remainingSeconds === 0,
-    canChangeMode: !isRunning && !isFocus && state.phase !== "break"
+    canChangeMode: !isRunning && !isFocus && state.phase !== "break",
+    theme: currentTheme
   });
 }
 

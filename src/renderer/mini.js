@@ -16,6 +16,7 @@ let modePickerArmed = false;
 
 function applySnapshot(snapshot) {
   if (!snapshot) return;
+  document.body.dataset.theme = snapshot.theme === "space" ? "space" : "light";
   elements.time.textContent = snapshot.time;
   elements.phase.textContent = snapshot.phase;
   elements.mode.textContent = snapshot.mode;
