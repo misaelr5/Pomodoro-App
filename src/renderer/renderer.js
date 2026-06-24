@@ -1,5 +1,7 @@
 const STORAGE_KEY = "futureFocusDataV1";
 const THEME_KEY = "futureFocusTheme";
+const SETTINGS_KEY = "israFocusSettingsV1";
+const TIMER_KEY = "israFocusTimerStateV1";
 const TODAY = getDateKey(new Date());
 
 // Nota mia: dejo constantes y reglas de negocio arriba para no mezclar dominio con UI.
@@ -60,6 +62,14 @@ const modes = [
   }
 ];
 
+const defaultSettings = {
+  sound: "soft",
+  volume: 35,
+  longBreakEvery: 4,
+  longBreakMinutes: 25,
+  alwaysOnTop: true
+};
+
 const elements = {
   modeList: document.getElementById("modeList"),
   openingMessage: document.getElementById("openingMessage"),
@@ -67,6 +77,12 @@ const elements = {
   startFocusButton: document.getElementById("startFocusButton"),
   mainMinimizeButton: document.getElementById("mainMinimizeButton"),
   finishDayButton: document.getElementById("finishDayButton"),
+  quickStartButton: document.getElementById("quickStartButton"),
+  soundSelect: document.getElementById("soundSelect"),
+  volumeInput: document.getElementById("volumeInput"),
+  longBreakEverySelect: document.getElementById("longBreakEverySelect"),
+  longBreakMinutesSelect: document.getElementById("longBreakMinutesSelect"),
+  alwaysOnTopInput: document.getElementById("alwaysOnTopInput"),
   pauseButton: document.getElementById("pauseButton"),
   resumeButton: document.getElementById("resumeButton"),
   toBreakButton: document.getElementById("toBreakButton"),
@@ -122,7 +138,8 @@ const elements = {
   panels: {
     tasks: document.getElementById("tasksPanel"),
     history: document.getElementById("historyPanel"),
-    stats: document.getElementById("statsPanel")
+    stats: document.getElementById("statsPanel"),
+    settings: document.getElementById("settingsPanel")
   }
 };
 
@@ -147,6 +164,7 @@ const state = {
 };
 
 let data = loadData();
+let settings = loadSettings();
 let currentTheme = localStorage.getItem(THEME_KEY) === "space" ? "space" : "light";
 
 const radius = 112;
@@ -205,6 +223,60 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+function loadSettings() {
+  try {
+    return { ...defaultSettings, ...JSON.parse(localStorage.getItem(SETTINGS_KEY)) };
+  } catch {
+    return { ...defaultSettings };
+  }
+}
+
+function saveSettings() {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function saveTimerState() {
+  const payload = {
+    selectedModeId: state.selectedModeId,
+    phase: state.phase,
+    totalSeconds: state.totalSeconds,
+    remainingSeconds: state.remainingSeconds,
+    timerEndsAt: state.timerEndsAt,
+    focusStartIso: state.focusStartIso,
+    activeBreakSeconds: state.activeBreakSeconds,
+    activeTaskId: state.activeTaskId,
+    savedAt: Date.now()
+  };
+  localStorage.setItem(TIMER_KEY, JSON.stringify(payload));
+}
+
+function restoreTimerState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(TIMER_KEY));
+    if (!saved || !modes.some((mode) => mode.id === saved.selectedModeId)) return;
+    state.selectedModeId = saved.selectedModeId;
+    state.phase = saved.phase ?? "setup";
+    state.totalSeconds = Number(saved.totalSeconds ?? getSelectedMode().focusMinutes * 60);
+    state.remainingSeconds = Number(saved.remainingSeconds ?? state.totalSeconds);
+    state.timerEndsAt = saved.timerEndsAt ?? null;
+    state.focusStartIso = saved.focusStartIso ?? null;
+    state.activeBreakSeconds = Number(saved.activeBreakSeconds ?? 0);
+    state.activeTaskId = saved.activeTaskId ?? null;
+
+    if (state.timerEndsAt && (state.phase === "focus" || state.phase === "break")) {
+      syncRemainingSeconds();
+      if (state.remainingSeconds > 0) {
+        runCountdown();
+      } else {
+        state.remainingSeconds = 0;
+        state.timerEndsAt = null;
+      }
+    }
+  } catch {
+    localStorage.removeItem(TIMER_KEY);
+  }
+}
+
 // =========================
 // Theme
 // =========================
@@ -223,6 +295,28 @@ function toggleTheme() {
   currentTheme = elements.themeToggle.checked ? "space" : "light";
   localStorage.setItem(THEME_KEY, currentTheme);
   applyTheme();
+}
+
+function applySettings() {
+  elements.soundSelect.value = settings.sound;
+  elements.volumeInput.value = String(settings.volume);
+  elements.longBreakEverySelect.value = String(settings.longBreakEvery);
+  elements.longBreakMinutesSelect.value = String(settings.longBreakMinutes);
+  elements.alwaysOnTopInput.checked = settings.alwaysOnTop;
+  window.futureFocus?.setMiniAlwaysOnTop?.(settings.alwaysOnTop);
+}
+
+function updateSettings() {
+  settings = {
+    sound: elements.soundSelect.value,
+    volume: Number(elements.volumeInput.value),
+    longBreakEvery: Number(elements.longBreakEverySelect.value),
+    longBreakMinutes: Number(elements.longBreakMinutesSelect.value),
+    alwaysOnTop: elements.alwaysOnTopInput.checked
+  };
+  saveSettings();
+  applySettings();
+  render();
 }
 
 // =========================
@@ -353,15 +447,23 @@ function getTickDelay() {
 // =========================
 
 function playNotification() {
+  if (settings.sound === "none") return;
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   const audioContext = new AudioContext();
   const gain = audioContext.createGain();
+  const volume = Math.max(0.001, settings.volume / 100);
+  const soundMap = {
+    soft: [523.25, 659.25, 783.99],
+    bell: [659.25, 987.77, 1318.51],
+    short: [880, 880]
+  };
+  const notes = soundMap[settings.sound] ?? soundMap.soft;
   gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.03);
+  gain.gain.exponentialRampToValueAtTime(volume * 0.55, audioContext.currentTime + 0.03);
   gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.85);
   gain.connect(audioContext.destination);
 
-  [523.25, 659.25, 783.99].forEach((frequency, index) => {
+  notes.forEach((frequency, index) => {
     const oscillator = audioContext.createOscillator();
     oscillator.type = "sine";
     oscillator.frequency.value = frequency;
@@ -369,6 +471,10 @@ function playNotification() {
     oscillator.start(audioContext.currentTime + index * 0.11);
     oscillator.stop(audioContext.currentTime + 0.55 + index * 0.11);
   });
+}
+
+function notifyUser(title, body) {
+  window.futureFocus?.notify?.({ title, body });
 }
 
 // =========================
@@ -695,6 +801,7 @@ function selectMode(modeId) {
   state.totalSeconds = mode.focusMinutes * 60;
   state.remainingSeconds = state.totalSeconds;
   state.phase = "setup";
+  saveTimerState();
   refreshWorkspace();
 }
 
@@ -716,6 +823,7 @@ function startTimer(phase, seconds) {
   }
   elements.completionCard.hidden = true;
   runCountdown();
+  saveTimerState();
   render();
 }
 
@@ -730,6 +838,7 @@ function runCountdown() {
 
   render();
   state.timerId = window.setTimeout(runCountdown, getTickDelay());
+  saveTimerState();
 }
 
 function clearTimer() {
@@ -748,11 +857,14 @@ function rescheduleCountdown() {
 function handlePhaseFinished() {
   playNotification();
   if (state.phase === "focus") {
+    notifyUser("Bloque de focus terminado", "Anota una idea rapida y pasa al descanso cuando estes listo.");
     registerPomodoro();
   } else if (state.phase === "break") {
     state.activeBreakSeconds = 0;
     state.timerEndsAt = null;
     state.phase = "complete";
+    notifyUser("Descanso terminado", "Pomodoro completado. Buen trabajo.");
+    saveTimerState();
   }
 }
 
@@ -783,13 +895,14 @@ function registerPomodoro() {
   }
   state.pendingHistoryId = entry.id;
   saveData();
+  saveTimerState();
   refreshWorkspace();
   showNoteDialog();
 }
 
 function shouldUseLongBreak() {
   const todayCount = getTodayHistory().length;
-  return todayCount > 0 && todayCount % 4 === 0;
+  return todayCount > 0 && todayCount % settings.longBreakEvery === 0;
 }
 
 function startFocus() {
@@ -797,9 +910,19 @@ function startFocus() {
   startTimer("focus", mode.focusMinutes * 60);
 }
 
+function quickStart() {
+  if (state.timerId !== null) return;
+  if (state.phase === "focus" || state.phase === "break") {
+    resumeTimer();
+    return;
+  }
+  startFocus();
+}
+
 function pauseTimer() {
   syncRemainingSeconds();
   clearTimer();
+  saveTimerState();
   render();
 }
 
@@ -808,13 +931,14 @@ function resumeTimer() {
     clearTimer();
     state.timerEndsAt = Date.now() + state.remainingSeconds * 1000;
     runCountdown();
+    saveTimerState();
     render();
   }
 }
 
 function startBreak() {
   const mode = getSelectedMode();
-  state.activeBreakSeconds = shouldUseLongBreak() ? 25 * 60 : mode.breakMinutes * 60;
+  state.activeBreakSeconds = shouldUseLongBreak() ? settings.longBreakMinutes * 60 : mode.breakMinutes * 60;
   startTimer("break", state.activeBreakSeconds);
 }
 
@@ -826,6 +950,7 @@ function resetSession() {
   state.remainingSeconds = state.totalSeconds;
   state.timerEndsAt = null;
   state.activeBreakSeconds = 0;
+  saveTimerState();
   render();
 }
 
@@ -1042,6 +1167,12 @@ function bindEvents() {
     render();
   });
   elements.themeToggle.addEventListener("change", toggleTheme);
+  elements.quickStartButton.addEventListener("click", quickStart);
+  elements.soundSelect.addEventListener("change", updateSettings);
+  elements.volumeInput.addEventListener("input", updateSettings);
+  elements.longBreakEverySelect.addEventListener("change", updateSettings);
+  elements.longBreakMinutesSelect.addEventListener("change", updateSettings);
+  elements.alwaysOnTopInput.addEventListener("change", updateSettings);
   elements.startFocusButton.addEventListener("click", startFocus);
   elements.mainMinimizeButton.addEventListener("click", openMiniPlayerFromMain);
   elements.finishDayButton.addEventListener("click", () => showSummaryDialog());
@@ -1089,6 +1220,8 @@ function bindEvents() {
 renderTaskControls();
 setOpeningMessage();
 applyTheme();
+applySettings();
+restoreTimerState();
 bindEvents();
 enableMiniPlayerDrag();
 refreshWorkspace();

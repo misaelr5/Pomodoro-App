@@ -93,6 +93,7 @@
           <button class="tab-button" data-tab="tasks" type="button">Tareas</button>
           <button class="tab-button" data-tab="history" type="button">Historial</button>
           <button class="tab-button" data-tab="stats" type="button">Estadisticas</button>
+          <button class="tab-button" data-tab="settings" type="button">Configuracion</button>
         </div>
 
         <section class="tab-panel" id="tasksPanel">
@@ -150,6 +151,62 @@
             <article class="stat-card">
               <p class="eyebrow">Estimacion vs realidad</p>
               <div class="stat-lines" id="accuracySummary"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="settingsPanel" hidden>
+          <div class="settings-grid">
+            <article class="stat-card">
+              <p class="eyebrow">Inicio rapido</p>
+              <h2>Empezar ahora</h2>
+              <p class="settings-copy">Usa el ultimo modo seleccionado y la tarea activa actual.</p>
+              <button class="primary-action compact" id="quickStartButton" type="button">Empezar ahora</button>
+            </article>
+
+            <article class="stat-card">
+              <p class="eyebrow">Sonido</p>
+              <label class="settings-field">
+                Alarma
+                <select id="soundSelect">
+                  <option value="soft">Suave</option>
+                  <option value="bell">Campana</option>
+                  <option value="short">Alarma corta</option>
+                  <option value="none">Sin sonido</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                Volumen
+                <input id="volumeInput" type="range" min="0" max="100" step="5" />
+              </label>
+            </article>
+
+            <article class="stat-card">
+              <p class="eyebrow">Descanso largo</p>
+              <label class="settings-field">
+                Cada
+                <select id="longBreakEverySelect">
+                  <option value="3">3 pomodoros</option>
+                  <option value="4">4 pomodoros</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                Duracion
+                <select id="longBreakMinutesSelect">
+                  <option value="20">20 min</option>
+                  <option value="25">25 min</option>
+                  <option value="30">30 min</option>
+                </select>
+              </label>
+            </article>
+
+            <article class="stat-card">
+              <p class="eyebrow">Mini ventana</p>
+              <label class="settings-check">
+                <input id="alwaysOnTopInput" type="checkbox" />
+                Siempre encima
+              </label>
+              <p class="settings-copy">La mini ventana recuerda su posicion y puede moverse sobre el escritorio.</p>
             </article>
           </div>
         </section>

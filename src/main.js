@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, Notification, ipcMain } = require("electron");
 const path = require("path");
 
 let allowClose = false;
@@ -104,6 +104,18 @@ ipcMain.on("restore-main-window", () => {
 
 ipcMain.on("close-mini-window", () => {
   miniWindow?.close();
+});
+
+ipcMain.on("set-mini-always-on-top", (_event, value) => {
+  miniWindow?.setAlwaysOnTop(Boolean(value));
+});
+
+ipcMain.on("notify", (_event, payload) => {
+  if (!Notification.isSupported()) return;
+  new Notification({
+    title: payload?.title ?? "ISRA FOCUS",
+    body: payload?.body ?? ""
+  }).show();
 });
 
 app.whenReady().then(() => {

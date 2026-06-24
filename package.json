@@ -5,7 +5,8 @@
   "description": "Sistema de enfoque por bloques para estudiar, programar y trabajar con más disciplina.",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build:win": "electron-packager . \"ISRA FOCUS\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/dist($|/)\" --ignore=\"^/isra-portfolio($|/)\""
   },
   "devDependencies": {
     "@electron/packager": "^20.0.0",

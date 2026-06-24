@@ -10,7 +10,9 @@ contextBridge.exposeInMainWorld("futureFocus", {
   onMiniSnapshot: (callback) => ipcRenderer.on("mini-snapshot", (_event, snapshot) => callback(snapshot)),
   miniCommand: (command) => ipcRenderer.send("mini-command", command),
   restoreMainWindow: () => ipcRenderer.send("restore-main-window"),
-  closeMiniWindow: () => ipcRenderer.send("close-mini-window")
+  closeMiniWindow: () => ipcRenderer.send("close-mini-window"),
+  setMiniAlwaysOnTop: (value) => ipcRenderer.send("set-mini-always-on-top", value),
+  notify: (payload) => ipcRenderer.send("notify", payload)
 });
 
 window.addEventListener("DOMContentLoaded", () => {
