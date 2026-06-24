@@ -11,9 +11,9 @@ function createWindow() {
     height: 840,
     minWidth: 820,
     minHeight: 620,
-    title: "ISRAFocus",
+    title: "Pomodoro App",
     backgroundColor: "#f3f4f6",
-    icon: path.join(__dirname, "renderer", "assets", "israfocus-icon.png"),
+    icon: path.join(__dirname, "renderer", "assets", "pomodoro-app-icon.png"),
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -22,7 +22,7 @@ function createWindow() {
       backgroundThrottling: true,
       devTools: false,
       spellcheck: false,
-      affinity: "israfocus-main"
+      affinity: "pomodoro-app-main"
     }
   });
 
@@ -56,8 +56,8 @@ function createMiniWindow() {
     skipTaskbar: false,
     backgroundColor: "#00000000",
     transparent: true,
-    title: "ISRAFocus Mini",
-    icon: path.join(__dirname, "renderer", "assets", "israfocus-icon.png"),
+    title: "Pomodoro App Mini",
+    icon: path.join(__dirname, "renderer", "assets", "pomodoro-app-icon.png"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -65,7 +65,7 @@ function createMiniWindow() {
       backgroundThrottling: false,
       devTools: false,
       spellcheck: false,
-      affinity: "israfocus-mini"
+      affinity: "pomodoro-app-mini"
     }
   });
 
@@ -113,7 +113,7 @@ ipcMain.on("set-mini-always-on-top", (_event, value) => {
 ipcMain.on("notify", (_event, payload) => {
   if (!Notification.isSupported()) return;
   new Notification({
-    title: payload?.title ?? "ISRA FOCUS",
+    title: payload?.title ?? "Pomodoro App",
     body: payload?.body ?? ""
   }).show();
 });

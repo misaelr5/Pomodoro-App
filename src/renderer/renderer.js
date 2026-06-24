@@ -1073,7 +1073,7 @@ function exportCsv() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `israfocus-historial-${TODAY}.csv`;
+  link.download = `pomodoro-app-historial-${TODAY}.csv`;
   link.click();
   URL.revokeObjectURL(url);
 }

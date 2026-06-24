@@ -1,12 +1,12 @@
 {
-  "name": "israfocus",
+  "name": "pomodoro-app",
   "version": "0.1.0",
-  "productName": "ISRA FOCUS",
+  "productName": "Pomodoro App",
   "description": "Sistema de enfoque por bloques para estudiar, programar y trabajar con más disciplina.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-packager . \"ISRA FOCUS\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/dist($|/)\" --ignore=\"^/isra-portfolio($|/)\""
+    "build:win": "electron-packager . \"Pomodoro App\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"^/dist($|/)\" --ignore=\"^/isra-portfolio($|/)\""
   },
   "devDependencies": {
     "@electron/packager": "^20.0.0",
