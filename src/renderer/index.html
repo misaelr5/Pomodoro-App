@@ -8,7 +8,7 @@
   </head>
   <body>
     <main class="app-shell">
-      <section class="topbar animate-slide-down" aria-label="Resumen de sesion">
+      <section class="topbar animate-slide-down" aria-label="Resumen de sesión">
         <div>
           <div class="brand-badge" aria-label="Pomodoro App">
             <span class="brand-mark">
@@ -17,7 +17,7 @@
             <span>Pomodoro App</span>
           </div>
           <p class="subtitle rotating-message" id="openingMessage">
-            Cuanto tiempo le vas a invertir a tu futuro hoy?
+            ¿Cuánto tiempo le vas a invertir a tu futuro hoy?
           </p>
         </div>
         <div class="topbar-actions">
@@ -27,7 +27,7 @@
             <strong>Space</strong>
           </label>
           <button class="ghost-button" id="mainMinimizeButton" type="button">Minimizar</button>
-          <button class="ghost-button" id="finishDayButton" type="button">Terminar dia</button>
+          <button class="ghost-button" id="finishDayButton" type="button">Terminar día</button>
           <div class="metric-pill">
             <span id="streakCount">0</span>
             <small>🔥 racha</small>
@@ -43,11 +43,11 @@
         <aside class="mode-panel animate-slide-left" aria-label="Elegir modo Pomodoro">
           <div class="section-heading">
             <p class="eyebrow">Modo</p>
-            <h2>Elegi tu ritmo</h2>
+            <h2>Elegí tu ritmo</h2>
           </div>
           <div class="mode-list" id="modeList"></div>
           <p class="long-break-note">
-            Regla practica: cada 3 o 4 bloques, hace un descanso mas largo de 20 a 30 min.
+            Regla práctica: cada 3 o 4 bloques, hacé un descanso más largo de 20 a 30 min.
           </p>
           <button class="primary-action" id="startFocusButton" type="button">Iniciar focus</button>
         </aside>
@@ -55,8 +55,8 @@
         <section class="timer-panel animate-scale-in" aria-live="polite">
           <div class="timer-header">
             <div>
-              <p class="eyebrow" id="phaseLabel">Preparacion</p>
-              <h2 id="activeModeName">Clasico</h2>
+              <p class="eyebrow" id="phaseLabel">Preparación</p>
+              <h2 id="activeModeName">Clásico</h2>
               <p class="active-task" id="activeTaskLabel">Sin tarea activa</p>
             </div>
             <div class="time-summary" id="timeSummary">25 min foco + 5 min descanso</div>
@@ -82,7 +82,7 @@
 
           <div class="completion-card" id="completionCard" hidden>
             <p class="eyebrow">Pomodoro completado</p>
-            <h3>Felicidades</h3>
+            <h3>Felicitaciones</h3>
             <p id="completionMessage"></p>
           </div>
         </section>
@@ -92,26 +92,26 @@
         <div class="tabs" role="tablist" aria-label="Secciones">
           <button class="tab-button" data-tab="tasks" type="button">Tareas</button>
           <button class="tab-button" data-tab="history" type="button">Historial</button>
-          <button class="tab-button" data-tab="stats" type="button">Estadisticas</button>
-          <button class="tab-button" data-tab="settings" type="button">Configuracion</button>
+          <button class="tab-button" data-tab="stats" type="button">Estadísticas</button>
+          <button class="tab-button" data-tab="settings" type="button">Configuración</button>
         </div>
 
         <section class="tab-panel" id="tasksPanel">
           <form class="task-form" id="taskForm">
             <label>
               Tarea
-              <input id="taskTitleInput" type="text" maxlength="90" placeholder="Que vas a hacer?" required />
+              <input id="taskTitleInput" type="text" maxlength="90" placeholder="¿Qué vas a hacer?" required />
             </label>
             <label>
-              Categoria
+              Categoría
               <select id="taskCategorySelect"></select>
             </label>
             <label id="customCategoryWrap" hidden>
-              Nueva categoria
+              Nueva categoría
               <input id="customCategoryInput" type="text" maxlength="24" placeholder="Nombre" />
             </label>
             <label>
-              Estimacion
+              Estimación
               <select id="taskEstimateSelect"></select>
             </label>
             <button class="primary-action compact" type="submit">Agregar tarea</button>
@@ -121,7 +121,7 @@
 
         <section class="tab-panel" id="historyPanel" hidden>
           <div class="panel-actions">
-            <h2>Historial del dia</h2>
+            <h2>Historial del día</h2>
             <button class="ghost-button" id="exportCsvButton" type="button">Exportar CSV</button>
           </div>
           <div class="history-list" id="historyList"></div>
@@ -129,15 +129,15 @@
 
         <section class="tab-panel" id="statsPanel" hidden>
           <div class="panel-actions">
-            <h2>Estadisticas semanales</h2>
+            <h2>Estadísticas semanales</h2>
             <label class="inline-filter">
-              Categoria
+              Categoría
               <select id="statsCategoryFilter"></select>
             </label>
           </div>
           <div class="stats-grid">
             <article class="stat-card">
-              <p class="eyebrow">Ultimos 7 dias</p>
+              <p class="eyebrow">Últimos 7 días</p>
               <div class="bar-chart" id="weeklyChart"></div>
             </article>
             <article class="stat-card">
@@ -145,11 +145,11 @@
               <div class="stat-lines" id="weeklySummary"></div>
             </article>
             <article class="stat-card">
-              <p class="eyebrow">Categorias</p>
+              <p class="eyebrow">Categorías</p>
               <div class="category-breakdown" id="categoryBreakdown"></div>
             </article>
             <article class="stat-card">
-              <p class="eyebrow">Estimacion vs realidad</p>
+              <p class="eyebrow">Estimación vs realidad</p>
               <div class="stat-lines" id="accuracySummary"></div>
             </article>
           </div>
@@ -191,7 +191,7 @@
                 </select>
               </label>
               <label class="settings-field">
-                Duracion
+                Duración
                 <select id="longBreakMinutesSelect">
                   <option value="20">20 min</option>
                   <option value="25">25 min</option>
@@ -232,11 +232,11 @@
           <div class="mini-cover__ring"></div>
           <div class="mini-cover__time">
             <strong id="miniTime">25:00</strong>
-            <span id="miniPhase">Preparacion</span>
+            <span id="miniPhase">Preparación</span>
           </div>
         </div>
         <div class="mini-player__info">
-          <p id="miniMode">Clasico</p>
+          <p id="miniMode">Clásico</p>
           <small id="miniCaption">Listo para empezar</small>
         </div>
         <div class="mini-player__controls">
@@ -251,9 +251,9 @@
 
     <dialog class="app-dialog" id="noteDialog">
       <form method="dialog" class="dialog-card" id="noteForm">
-        <p class="eyebrow">Nota rapida</p>
-        <h2>Como fue este bloque?</h2>
-        <textarea id="noteInput" maxlength="200" placeholder="Maximo 200 caracteres"></textarea>
+        <p class="eyebrow">Nota rápida</p>
+        <h2>¿Cómo fue este bloque?</h2>
+        <textarea id="noteInput" maxlength="200" placeholder="Máximo 200 caracteres"></textarea>
         <div class="dialog-actions">
           <button class="ghost-button" value="skip" type="submit">Omitir</button>
           <button class="primary-action compact" value="save" type="submit">Guardar nota</button>
@@ -264,7 +264,7 @@
     <dialog class="app-dialog" id="summaryDialog">
       <form method="dialog" class="dialog-card summary-dialog" id="summaryForm">
         <p class="eyebrow">Resumen</p>
-        <h2 id="summaryTitle">Cierre del dia</h2>
+        <h2 id="summaryTitle">Cierre del día</h2>
         <div class="summary-grid" id="summaryContent"></div>
         <div class="dialog-actions">
           <button class="ghost-button" value="close" type="submit">Seguir trabajando</button>

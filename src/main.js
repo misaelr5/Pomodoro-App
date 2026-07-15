@@ -28,7 +28,7 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, "renderer", "index.html"));
 
-  // Nota mia: el cierre pasa primero por la UI para mostrar resumen del dia.
+  // Nota mia: el cierre pasa primero por la UI para mostrar resumen del día.
   mainWindow.on("close", (event) => {
     if (allowClose) {
       return;

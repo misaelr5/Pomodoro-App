@@ -2,7 +2,6 @@ const STORAGE_KEY = "futureFocusDataV1";
 const THEME_KEY = "futureFocusTheme";
 const SETTINGS_KEY = "israFocusSettingsV1";
 const TIMER_KEY = "israFocusTimerStateV1";
-const TODAY = getDateKey(new Date());
 
 // Nota mia: dejo constantes y reglas de negocio arriba para no mezclar dominio con UI.
 const defaultCategories = [
@@ -30,7 +29,7 @@ const openingMessages = [
 const modes = [
   {
     id: "classic",
-    name: "Clasico",
+    name: "Clásico",
     focusMinutes: 25,
     breakMinutes: 5,
     time: "25 min foco + 5 min descanso",
@@ -42,7 +41,7 @@ const modes = [
     focusMinutes: 40,
     breakMinutes: 10,
     time: "40 min foco + 10 min descanso",
-    ideal: "Lectura, programacion, teoria larga"
+    ideal: "Lectura, programación, teoría larga"
   },
   {
     id: "deep",
@@ -197,7 +196,7 @@ function normalizeData(value) {
       estimate: Number(task.estimate ?? 1),
       actualPomodoros: Number(task.actualPomodoros ?? 0),
       done: Boolean(task.done),
-      createdDate: task.createdDate ?? TODAY,
+      createdDate: task.createdDate ?? getTodayKey(),
       completedDate: task.completedDate ?? ""
     })) : [],
     history: Array.isArray(base.history) ? base.history.map((entry) => ({
@@ -206,7 +205,7 @@ function normalizeData(value) {
       startIso: entry.startIso ?? entry.endIso ?? new Date().toISOString(),
       endIso: entry.endIso ?? new Date().toISOString(),
       durationMinutes: Number(entry.durationMinutes ?? 25),
-      mode: entry.mode ?? "Clasico",
+      mode: entry.mode ?? "Clásico",
       taskId: entry.taskId ?? null,
       task: entry.task ?? "",
       category: entry.category ?? "Otro",
@@ -331,6 +330,10 @@ function getDateKey(date) {
   return `${year}-${month}-${day}`;
 }
 
+function getTodayKey() {
+  return getDateKey(new Date());
+}
+
 function addDays(dateKey, amount) {
   const [year, month, day] = dateKey.split("-").map(Number);
   const date = new Date(year, month - 1, day);
@@ -355,11 +358,13 @@ function getCategory(name) {
 }
 
 function getTodayHistory() {
-  return data.history.filter((entry) => entry.date === TODAY);
+  const todayKey = getTodayKey();
+  return data.history.filter((entry) => entry.date === todayKey);
 }
 
 function getTodayTasks() {
-  return data.tasks.filter((task) => task.createdDate === TODAY);
+  const todayKey = getTodayKey();
+  return data.tasks.filter((task) => task.createdDate === todayKey);
 }
 
 function formatTime(totalSeconds) {
@@ -392,10 +397,12 @@ function escapeHtml(value) {
 
 function calculateStreak() {
   const days = new Set(data.completedDays);
-  if (!days.has(TODAY)) {
-    return days.has(addDays(TODAY, -1)) ? countBackwards(addDays(TODAY, -1), days) : 0;
+  const todayKey = getTodayKey();
+  if (!days.has(todayKey)) {
+    const yesterdayKey = addDays(todayKey, -1);
+    return days.has(yesterdayKey) ? countBackwards(yesterdayKey, days) : 0;
   }
-  return countBackwards(TODAY, days);
+  return countBackwards(todayKey, days);
 }
 
 function countBackwards(startDay, days) {
@@ -409,8 +416,9 @@ function countBackwards(startDay, days) {
 }
 
 function markCompletedDay() {
-  if (!data.completedDays.includes(TODAY)) {
-    data.completedDays.push(TODAY);
+  const todayKey = getTodayKey();
+  if (!data.completedDays.includes(todayKey)) {
+    data.completedDays.push(todayKey);
   }
 }
 
@@ -418,7 +426,7 @@ function getSessionSummary() {
   const todayHistory = getTodayHistory();
   const focusMinutes = todayHistory.reduce((sum, entry) => sum + entry.durationMinutes, 0);
   const pomodoros = todayHistory.length;
-  const message = pomodoros < 2 ? "Algo es algo" : pomodoros <= 5 ? "Buen dia" : "Dia excelente";
+  const message = pomodoros < 2 ? "Algo es algo" : pomodoros <= 5 ? "Buen día" : "Día excelente";
   return { todayHistory, focusMinutes, pomodoros, message, streak: calculateStreak() };
 }
 
@@ -519,7 +527,7 @@ function renderTaskControls() {
   });
   const customOption = document.createElement("option");
   customOption.value = "__custom";
-  customOption.textContent = "Crear categoria";
+  customOption.textContent = "Crear categoría";
   elements.taskCategorySelect.appendChild(customOption);
 
   const previousFilter = elements.statsCategoryFilter.value || "__all";
@@ -539,7 +547,7 @@ function renderTasks() {
   elements.taskList.innerHTML = "";
 
   if (!tasks.length) {
-    elements.taskList.innerHTML = `<p class="empty-state">Agrega una tarea para asociarla al proximo bloque de focus.</p>`;
+    elements.taskList.innerHTML = `<p class="empty-state">Agregá una tarea para asociarla al próximo bloque de focus.</p>`;
     return;
   }
 
@@ -595,7 +603,8 @@ function renderHistory() {
 
 function renderStats() {
   const selectedCategory = elements.statsCategoryFilter.value || "__all";
-  const last7 = Array.from({ length: 7 }, (_, index) => addDays(TODAY, index - 6));
+  const todayKey = getTodayKey();
+  const last7 = Array.from({ length: 7 }, (_, index) => addDays(todayKey, index - 6));
   const rows = last7.map((dateKey) => {
     const entries = data.history.filter((entry) => {
       const matchesDate = entry.date === dateKey;
@@ -622,7 +631,7 @@ function renderStats() {
   const bestDay = rows.slice().sort((a, b) => b.pomodoros - a.pomodoros)[0];
   const peak = getPeakProductivity();
   elements.weeklySummary.innerHTML = `
-    <p><strong>Dia mas productivo:</strong> ${bestDay.pomodoros ? bestDay.dateKey : "Sin datos"}</p>
+    <p><strong>Día más productivo:</strong> ${bestDay.pomodoros ? bestDay.dateKey : "Sin datos"}</p>
     <p><strong>Foco semanal:</strong> ${formatHumanMinutes(rows.reduce((sum, row) => sum + row.minutes, 0))}</p>
     <p><strong>Hora pico:</strong> ${peak}</p>
   `;
@@ -644,7 +653,7 @@ function renderStats() {
         <strong>${count}</strong>
       </div>
     `;
-  }).join("") || `<p class="empty-state">Sin categorias registradas.</p>`;
+  }).join("") || `<p class="empty-state">Sin categorías registradas.</p>`;
 
   elements.accuracySummary.innerHTML = getAccuracySummary();
 }
@@ -661,13 +670,13 @@ function getAccuracySummary() {
   }, 0) / completedTasks.length;
 
   return `
-    <p><strong>Precision promedio:</strong> ${Math.round(precision)}%</p>
+    <p><strong>Precisión promedio:</strong> ${Math.round(precision)}%</p>
     <p><strong>Tareas medidas:</strong> ${completedTasks.length}</p>
   `;
 }
 
 function getPeakProductivity() {
-  const startDate = addDays(TODAY, -13);
+  const startDate = addDays(getTodayKey(), -13);
   const buckets = new Map();
   data.history
     .filter((entry) => entry.date >= startDate)
@@ -718,10 +727,10 @@ function render({ full = false } = {}) {
   elements.activeTaskLabel.textContent = activeTask ? `Tarea activa: ${activeTask.title}` : "Sin tarea activa";
 
   elements.phaseLabel.textContent = {
-    setup: "Preparacion",
+    setup: "Preparación",
     focus: "Focus",
     break: "Descanso",
-    complete: "Sesion finalizada"
+    complete: "Sesión finalizada"
   }[state.phase];
 
   elements.timerCaption.textContent = {
@@ -859,7 +868,7 @@ function rescheduleCountdown() {
 function handlePhaseFinished() {
   playNotification();
   if (state.phase === "focus") {
-    notifyUser("Bloque de focus terminado", "Anota una idea rapida y pasa al descanso cuando estes listo.");
+    notifyUser("Bloque de focus terminado", "Anotá una idea rápida y pasá al descanso cuando estés listo.");
     registerPomodoro();
   } else if (state.phase === "break") {
     state.activeBreakSeconds = 0;
@@ -876,7 +885,7 @@ function registerPomodoro() {
   const endIso = new Date().toISOString();
   const entry = {
     id: uid("pomodoro"),
-    date: TODAY,
+    date: getTodayKey(),
     startIso: state.focusStartIso ?? endIso,
     endIso,
     durationMinutes: mode.focusMinutes,
@@ -975,7 +984,7 @@ function handleTaskSubmit(event) {
     estimate: Number(elements.taskEstimateSelect.value),
     actualPomodoros: 0,
     done: false,
-    createdDate: TODAY,
+    createdDate: getTodayKey(),
     completedDate: ""
   };
   data.tasks.push(task);
@@ -998,7 +1007,7 @@ function handleTaskListClick(event) {
   if (doneInput) {
     const task = getTask(doneInput.dataset.taskDone);
     task.done = doneInput.checked;
-    task.completedDate = task.done ? TODAY : "";
+    task.completedDate = task.done ? getTodayKey() : "";
     saveData();
     refreshWorkspace();
   }
@@ -1034,13 +1043,13 @@ function handleNoteSubmit(event) {
 
 function showSummaryDialog({ closing = false } = {}) {
   const summary = getSessionSummary();
-  elements.summaryTitle.textContent = closing ? "Resumen antes de cerrar" : "Resumen del dia";
+  elements.summaryTitle.textContent = closing ? "Resumen antes de cerrar" : "Resumen del día";
   elements.confirmCloseButton.hidden = !closing;
   elements.summaryContent.innerHTML = `
     <article><strong>${summary.pomodoros}</strong><small>Pomodoros completados</small></article>
     <article><strong>${formatHumanMinutes(summary.focusMinutes)}</strong><small>Tiempo total de foco</small></article>
     <article><strong>${summary.streak}</strong><small>Racha actual</small></article>
-    <article><strong>${summary.message}</strong><small>Mensaje del dia</small></article>
+    <article><strong>${summary.message}</strong><small>Mensaje del día</small></article>
   `;
   if (typeof elements.summaryDialog.showModal === "function") {
     elements.summaryDialog.showModal();
@@ -1058,7 +1067,7 @@ function handleSummarySubmit(event) {
 
 function exportCsv() {
   const rows = [
-    ["Fecha", "Hora inicio", "Hora fin", "Duracion (min)", "Modo", "Tarea", "Categoria", "Notas"],
+    ["Fecha", "Hora inicio", "Hora fin", "Duración (min)", "Modo", "Tarea", "Categoría", "Notas"],
     ...data.history.map((entry) => [
       entry.date,
       formatClock(entry.startIso),
@@ -1075,7 +1084,7 @@ function exportCsv() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `pomodoro-app-historial-${TODAY}.csv`;
+  link.download = `pomodoro-app-historial-${getTodayKey()}.csv`;
   link.click();
   URL.revokeObjectURL(url);
 }
